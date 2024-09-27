@@ -234,6 +234,193 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+-- Build code
+vim.keymap.set('n', '<leader>nb', function()
+  BuildCode()
+end, { desc = 'Neovim | Build Code', silent = true })
+
+-- Run Code
+vim.keymap.set('n', '<leader>nr', function()
+  RunCode()
+end, { desc = 'Neovim | Run Code', silent = true })
+
+local function substitute(cmd)
+  cmd = cmd:gsub('%%', vim.fn.expand '%')
+  cmd = cmd:gsub('$fileBase', vim.fn.expand '%:r')
+  cmd = cmd:gsub('$filePath', vim.fn.expand '%:p')
+  cmd = cmd:gsub('$file', vim.fn.expand '%')
+  cmd = cmd:gsub('$dir', vim.fn.expand '%:p:h')
+  cmd = cmd:gsub('#', vim.fn.expand '#')
+  cmd = cmd:gsub('$altFile', vim.fn.expand '#')
+  return cmd
+end
+
+function BuildCode()
+  local file_extension = vim.fn.expand '%:e'
+  local selected_cmd = ''
+  local term_cmd = 'bot 10 new | term '
+  local supported_filetypes = {
+    c = {
+      'gcc % -o $fileBase',
+      -- default = 'gcc % -o $fileBase',
+      -- debug = 'gcc -g % -o $fileBase',
+    },
+    cpp = {
+      'g++ % -o $fileBase',
+      -- default = 'g++ % -o  $fileBase',
+      -- debug = 'g++ -g % -o  $fileBase',
+      ---- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
+      -- competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase',
+    },
+    --[[
+    cs = {
+      default = 'dotnet run',
+    },
+    go = {
+      default = 'go run %',
+    },
+    html = {
+      default = 'firefox %', -- NOTE: Change this based on your browser that you use
+    },
+    java = {
+      default = 'java %',
+    },
+    jl = {
+      default = 'julia %',
+    },
+    js = {
+      default = 'node %',
+      debug = 'node --inspect %',
+    },
+    lua = {
+      default = 'lua %',
+    },
+    php = {
+      default = 'php %',
+    },
+    pl = {
+      default = 'perl %',
+    },
+    py = {
+      default = 'python3 %',
+    },
+    r = {
+      default = 'Rscript %',
+    },
+    rb = {
+      default = 'ruby %',
+    },
+    rs = {
+      default = 'rustc % && $fileBase',
+    },
+    ts = {
+      default = 'tsc % && node $fileBase',
+    },
+    ]]
+  }
+
+  if supported_filetypes[file_extension] then
+    local choices = vim.tbl_keys(supported_filetypes[file_extension])
+
+    if #choices == 0 then
+      vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
+    elseif #choices == 1 then
+      selected_cmd = supported_filetypes[file_extension][choices[1]]
+      vim.cmd(term_cmd .. substitute(selected_cmd))
+    else
+      vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
+        selected_cmd = supported_filetypes[file_extension][choice]
+        if selected_cmd then
+          vim.cmd(term_cmd .. substitute(selected_cmd))
+        end
+      end)
+    end
+  else
+    vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
+  end
+end
+
+function RunCode()
+  local file_extension = vim.fn.expand '%:e'
+  local selected_cmd = ''
+  local term_cmd = 'bot 10 new | term '
+  local supported_filetypes = {
+    c = {
+      default = 'gcc % -o $fileBase && $fileBase',
+      debug = 'gcc -g % -o $fileBase && $fileBase',
+    },
+    cpp = {
+      default = 'g++ % -o  $fileBase && $fileBase',
+      debug = 'g++ -g % -o  $fileBase',
+      -- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
+      competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase',
+    },
+    cs = {
+      default = 'dotnet run',
+    },
+    go = {
+      default = 'go run %',
+    },
+    html = {
+      default = 'firefox %', -- NOTE: Change this based on your browser that you use
+    },
+    java = {
+      default = 'java %',
+    },
+    jl = {
+      default = 'julia %',
+    },
+    js = {
+      default = 'node %',
+      debug = 'node --inspect %',
+    },
+    lua = {
+      default = 'lua %',
+    },
+    php = {
+      default = 'php %',
+    },
+    pl = {
+      default = 'perl %',
+    },
+    py = {
+      default = 'python3 %',
+    },
+    r = {
+      default = 'Rscript %',
+    },
+    rb = {
+      default = 'ruby %',
+    },
+    rs = {
+      default = 'rustc % && $fileBase',
+    },
+    ts = {
+      default = 'tsc % && node $fileBase',
+    },
+  }
+
+  if supported_filetypes[file_extension] then
+    local choices = vim.tbl_keys(supported_filetypes[file_extension])
+
+    if #choices == 0 then
+      vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
+    elseif #choices == 1 then
+      selected_cmd = supported_filetypes[file_extension][choices[1]]
+      vim.cmd(term_cmd .. substitute(selected_cmd))
+    else
+      vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
+        selected_cmd = supported_filetypes[file_extension][choice]
+        if selected_cmd then
+          vim.cmd(term_cmd .. substitute(selected_cmd))
+        end
+      end)
+    end
+  else
+    vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
+  end
+end
+
 -- [[ Configure and install plugins ]]
 --
 --  To check the current status of your plugins, run
@@ -452,6 +639,7 @@ require('lazy').setup({
       -- Shortcut for searching your Neovim configuration files
       vim.keymap.set('n', '<leader>sn', function()
         builtin.find_files { cwd = vim.fn.stdpath 'config' }
+        -- NOTE: Me: nvim config keybind
       end, { desc = '[S]earch [N]eovim files' })
     end,
   },
@@ -626,8 +814,17 @@ require('lazy').setup({
       local servers = {
         clangd = {},
         -- gopls = {},
-        htmx = {},
         pyright = {},
+        texlab = {},
+        html = {
+          configurationSection = { 'html', 'css', 'javascript' },
+          embeddedLanguages = {
+            css = true,
+            javascript = true,
+          },
+          provideFormatter = true,
+        },
+        jq = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -927,6 +1124,7 @@ require('lazy').setup({
         'css',
         'javascript',
         'java',
+        'json',
         'diff',
         'html',
         'lua',
@@ -978,6 +1176,16 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
   -- { import = 'custom.plugins' },
+  {
+    'lervag/vimtex',
+    lazy = false, -- we don't want to lazy load VimTeX
+    -- tag = "v2.15", -- uncomment to pin to a specific release
+    init = function()
+      -- VimTeX configuration goes here, e.g.
+      vim.g.vimtex_view_method = 'zathura'
+      vim.g.vimtex_compiler_method = 'texlive'
+    end,
+  },
 }, {
   ui = {
     -- If you are using a Nerd Font: set icons to an empty table which will use the
