@@ -433,6 +433,10 @@ end
 --
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
+
+  -- 2025-02-03: If there are issues with "Could not find equinox launcher", then refer to 'Diagnostic commands' at https://github.com/williamboman/mason.nvim/issues/1863
+  { import = 'lsp' }, -- https://github.com/nvim-java/nvim-java?tab=readme-ov-file
+
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   -- Me: Don't need this.
   -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
@@ -1173,7 +1177,9 @@ require('lazy').setup({
   --
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
-  -- { import = 'custom.plugins' },
+
+  { import = 'custom.plugins' },
+
   {
     'lervag/vimtex',
     lazy = false, -- we don't want to lazy load VimTeX
