@@ -234,192 +234,192 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
--- Build code
-vim.keymap.set('n', '<leader>nb', function()
-  BuildCode()
-end, { desc = 'Neovim | Build Code', silent = true })
-
--- Run Code
-vim.keymap.set('n', '<leader>nr', function()
-  RunCode()
-end, { desc = 'Neovim | Run Code', silent = true })
-
-local function substitute(cmd)
-  cmd = cmd:gsub('%%', vim.fn.expand '%')
-  cmd = cmd:gsub('$fileBase', vim.fn.expand '%:r')
-  cmd = cmd:gsub('$filePath', vim.fn.expand '%:p')
-  cmd = cmd:gsub('$file', vim.fn.expand '%')
-  cmd = cmd:gsub('$dir', vim.fn.expand '%:p:h')
-  cmd = cmd:gsub('#', vim.fn.expand '#')
-  cmd = cmd:gsub('$altFile', vim.fn.expand '#')
-  return cmd
-end
-
-function BuildCode()
-  local file_extension = vim.fn.expand '%:e'
-  local selected_cmd = ''
-  local term_cmd = 'bot 10 new | term '
-  local supported_filetypes = {
-    c = {
-      'gcc % -o $fileBase',
-      -- default = 'gcc % -o $fileBase',
-      -- debug = 'gcc -g % -o $fileBase',
-    },
-    cpp = {
-      'g++ % -o $fileBase',
-      -- default = 'g++ % -o  $fileBase',
-      -- debug = 'g++ -g % -o  $fileBase',
-      ---- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
-      -- competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase',
-    },
-    --[[
-    cs = {
-      default = 'dotnet run',
-    },
-    go = {
-      default = 'go run %',
-    },
-    html = {
-      default = 'firefox %', -- NOTE: Change this based on your browser that you use
-    },
-    java = {
-      default = 'java %',
-    },
-    jl = {
-      default = 'julia %',
-    },
-    js = {
-      default = 'node %',
-      debug = 'node --inspect %',
-    },
-    lua = {
-      default = 'lua %',
-    },
-    php = {
-      default = 'php %',
-    },
-    pl = {
-      default = 'perl %',
-    },
-    py = {
-      default = 'python3 %',
-    },
-    r = {
-      default = 'Rscript %',
-    },
-    rb = {
-      default = 'ruby %',
-    },
-    rs = {
-      default = 'rustc % && $fileBase',
-    },
-    ts = {
-      default = 'tsc % && node $fileBase',
-    },
-    ]]
-  }
-
-  if supported_filetypes[file_extension] then
-    local choices = vim.tbl_keys(supported_filetypes[file_extension])
-
-    if #choices == 0 then
-      vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
-    elseif #choices == 1 then
-      selected_cmd = supported_filetypes[file_extension][choices[1]]
-      vim.cmd(term_cmd .. substitute(selected_cmd))
-    else
-      vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
-        selected_cmd = supported_filetypes[file_extension][choice]
-        if selected_cmd then
-          vim.cmd(term_cmd .. substitute(selected_cmd))
-        end
-      end)
-    end
-  else
-    vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
-  end
-end
-
-function RunCode()
-  local file_extension = vim.fn.expand '%:e'
-  local selected_cmd = ''
-  local term_cmd = 'bot 10 new | term '
-  local supported_filetypes = {
-    c = {
-      default = 'gcc % -o $fileBase && $fileBase',
-      debug = 'gcc -g % -o $fileBase && $fileBase',
-    },
-    cpp = {
-      default = 'g++ % -o  $fileBase && $fileBase',
-      debug = 'g++ -g % -o  $fileBase',
-      -- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
-      competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase',
-    },
-    cs = {
-      default = 'dotnet run',
-    },
-    go = {
-      default = 'go run %',
-    },
-    html = {
-      default = 'firefox %', -- NOTE: Change this based on your browser that you use
-    },
-    java = {
-      default = 'java %',
-    },
-    jl = {
-      default = 'julia %',
-    },
-    js = {
-      default = 'node %',
-      debug = 'node --inspect %',
-    },
-    lua = {
-      default = 'lua %',
-    },
-    php = {
-      default = 'php %',
-    },
-    pl = {
-      default = 'perl %',
-    },
-    py = {
-      default = 'python3 %',
-    },
-    r = {
-      default = 'Rscript %',
-    },
-    rb = {
-      default = 'ruby %',
-    },
-    rs = {
-      default = 'rustc % && $fileBase',
-    },
-    ts = {
-      default = 'tsc % && node $fileBase',
-    },
-  }
-
-  if supported_filetypes[file_extension] then
-    local choices = vim.tbl_keys(supported_filetypes[file_extension])
-
-    if #choices == 0 then
-      vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
-    elseif #choices == 1 then
-      selected_cmd = supported_filetypes[file_extension][choices[1]]
-      vim.cmd(term_cmd .. substitute(selected_cmd))
-    else
-      vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
-        selected_cmd = supported_filetypes[file_extension][choice]
-        if selected_cmd then
-          vim.cmd(term_cmd .. substitute(selected_cmd))
-        end
-      end)
-    end
-  else
-    vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
-  end
-end
+-- -- Build code
+-- vim.keymap.set('n', '<leader>nb', function()
+--   BuildCode()
+-- end, { desc = 'Neovim | Build Code', silent = true })
+-- 
+-- -- Run Code
+-- vim.keymap.set('n', '<leader>nr', function()
+--   RunCode()
+-- end, { desc = 'Neovim | Run Code', silent = true })
+-- 
+-- local function substitute(cmd)
+--   cmd = cmd:gsub('%%', vim.fn.expand '%')
+--   cmd = cmd:gsub('$fileBase', vim.fn.expand '%:r')
+--   cmd = cmd:gsub('$filePath', vim.fn.expand '%:p')
+--   cmd = cmd:gsub('$file', vim.fn.expand '%')
+--   cmd = cmd:gsub('$dir', vim.fn.expand '%:p:h')
+--   cmd = cmd:gsub('#', vim.fn.expand '#')
+--   cmd = cmd:gsub('$altFile', vim.fn.expand '#')
+--   return cmd
+-- end
+-- 
+-- function BuildCode()
+--   local file_extension = vim.fn.expand '%:e'
+--   local selected_cmd = ''
+--   local term_cmd = 'bot 10 new | term '
+--   local supported_filetypes = {
+--     c = {
+--       'gcc % -o $fileBase',
+--       -- default = 'gcc % -o $fileBase',
+--       -- debug = 'gcc -g % -o $fileBase',
+--     },
+--     cpp = {
+--       'g++ % -o $fileBase',
+--       -- default = 'g++ % -o  $fileBase',
+--       -- debug = 'g++ -g % -o  $fileBase',
+--       ---- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
+--       -- competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase',
+--     },
+--     --[[
+--     cs = {
+--       default = 'dotnet run',
+--     },
+--     go = {
+--       default = 'go run %',
+--     },
+--     html = {
+--       default = 'firefox %', -- NOTE: Change this based on your browser that you use
+--     },
+--     java = {
+--       default = 'java %',
+--     },
+--     jl = {
+--       default = 'julia %',
+--     },
+--     js = {
+--       default = 'node %',
+--       debug = 'node --inspect %',
+--     },
+--     lua = {
+--       default = 'lua %',
+--     },
+--     php = {
+--       default = 'php %',
+--     },
+--     pl = {
+--       default = 'perl %',
+--     },
+--     py = {
+--       default = 'python3 %',
+--     },
+--     r = {
+--       default = 'Rscript %',
+--     },
+--     rb = {
+--       default = 'ruby %',
+--     },
+--     rs = {
+--       default = 'rustc % && $fileBase',
+--     },
+--     ts = {
+--       default = 'tsc % && node $fileBase',
+--     },
+--     ]]
+--   }
+-- 
+--   if supported_filetypes[file_extension] then
+--     local choices = vim.tbl_keys(supported_filetypes[file_extension])
+-- 
+--     if #choices == 0 then
+--       vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
+--     elseif #choices == 1 then
+--       selected_cmd = supported_filetypes[file_extension][choices[1]]
+--       vim.cmd(term_cmd .. substitute(selected_cmd))
+--     else
+--       vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
+--         selected_cmd = supported_filetypes[file_extension][choice]
+--         if selected_cmd then
+--           vim.cmd(term_cmd .. substitute(selected_cmd))
+--         end
+--       end)
+--     end
+--   else
+--     vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
+--   end
+-- end
+-- 
+-- function RunCode()
+--   local file_extension = vim.fn.expand '%:e'
+--   local selected_cmd = ''
+--   local term_cmd = 'bot 10 new | term '
+--   local supported_filetypes = {
+--     c = {
+--       default = 'gcc % -o $fileBase && $fileBase',
+--       debug = 'gcc -g % -o $fileBase && $fileBase',
+--     },
+--     cpp = {
+--       default = 'g++ % -o  $fileBase && $fileBase',
+--       debug = 'g++ -g % -o  $fileBase',
+--       -- competitive = "g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase<input.txt",
+--       competitive = 'g++ -std=c++17 -Wall -DAL -O2 % -o $fileBase && $fileBase',
+--     },
+--     cs = {
+--       default = 'dotnet run',
+--     },
+--     go = {
+--       default = 'go run %',
+--     },
+--     html = {
+--       default = 'firefox %', -- NOTE: Change this based on your browser that you use
+--     },
+--     java = {
+--       default = 'java %',
+--     },
+--     jl = {
+--       default = 'julia %',
+--     },
+--     js = {
+--       default = 'node %',
+--       debug = 'node --inspect %',
+--     },
+--     lua = {
+--       default = 'lua %',
+--     },
+--     php = {
+--       default = 'php %',
+--     },
+--     pl = {
+--       default = 'perl %',
+--     },
+--     py = {
+--       default = 'python3 %',
+--     },
+--     r = {
+--       default = 'Rscript %',
+--     },
+--     rb = {
+--       default = 'ruby %',
+--     },
+--     rs = {
+--       default = 'rustc % && $fileBase',
+--     },
+--     ts = {
+--       default = 'tsc % && node $fileBase',
+--     },
+--   }
+-- 
+--   if supported_filetypes[file_extension] then
+--     local choices = vim.tbl_keys(supported_filetypes[file_extension])
+-- 
+--     if #choices == 0 then
+--       vim.notify("It doesn't contain any command", vim.log.levels.WARN, { title = 'Code Runner' })
+--     elseif #choices == 1 then
+--       selected_cmd = supported_filetypes[file_extension][choices[1]]
+--       vim.cmd(term_cmd .. substitute(selected_cmd))
+--     else
+--       vim.ui.select(choices, { prompt = 'Choose a command: ' }, function(choice)
+--         selected_cmd = supported_filetypes[file_extension][choice]
+--         if selected_cmd then
+--           vim.cmd(term_cmd .. substitute(selected_cmd))
+--         end
+--       end)
+--     end
+--   else
+--     vim.notify("The filetype isn't included in the list", vim.log.levels.WARN, { title = 'Code Runner' })
+--   end
+-- end
 
 -- [[ Configure and install plugins ]]
 --
@@ -439,7 +439,6 @@ require('lazy').setup({
 
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   -- Me: Don't need this.
-  -- 'tpope/vim-sleuth', -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -902,22 +901,22 @@ require('lazy').setup({
     },
     opts = {
       notify_on_error = false,
-      format_on_save = function(bufnr)
-        -- Disable "format_on_save lsp_fallback" for languages that don't
-        -- have a well standardized coding style. You can add additional
-        -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
-        local lsp_format_opt
-        if disable_filetypes[vim.bo[bufnr].filetype] then
-          lsp_format_opt = 'never'
-        else
-          lsp_format_opt = 'fallback'
-        end
-        return {
-          timeout_ms = 500,
-          lsp_format = lsp_format_opt,
-        }
-      end,
+      -- format_on_save = function(bufnr)
+      --   -- Disable "format_on_save lsp_fallback" for languages that don't
+      --   -- have a well standardized coding style. You can add additional
+      --   -- languages here or re-enable it for the disabled ones.
+      --   local disable_filetypes = { c = true, cpp = true }
+      --   local lsp_format_opt
+      --   if disable_filetypes[vim.bo[bufnr].filetype] then
+      --     lsp_format_opt = 'never'
+      --   else
+      --     lsp_format_opt = 'fallback'
+      --   end
+      --   return {
+      --     timeout_ms = 500,
+      --     lsp_format = lsp_format_opt,
+      --   }
+      -- end,
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -932,6 +931,7 @@ require('lazy').setup({
   { -- Autocompletion
     'hrsh7th/nvim-cmp',
     event = 'InsertEnter',
+
     dependencies = {
       -- Snippet Engine & its associated nvim-cmp source
       {
@@ -1044,12 +1044,12 @@ require('lazy').setup({
       }
     end,
   },
-  'luisiacc/gruvbox-baby',
-  'hardselius/warlock',
-  'alligator/accent.vim',
-  'folke/tokyonight.nvim',
-  'kdheepak/monochrome.nvim',
-  'pgdouyon/vim-yin-yang',
+  -- 'luisiacc/gruvbox-baby',
+  -- 'hardselius/warlock',
+  -- 'alligator/accent.vim',
+  -- 'folke/tokyonight.nvim',
+  -- 'kdheepak/monochrome.nvim',
+  -- 'pgdouyon/vim-yin-yang',
   { 'catppuccin/nvim', name = 'catppuccin', priority = 1000 },
   {
     'dasupradyumna/midnight.nvim',
@@ -1057,62 +1057,62 @@ require('lazy').setup({
     priority = 900,
   },
   { -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    --
-    -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
-    --
-    'catppuccin/nvim',
-    priority = 1000, -- Make sure to load this before all the other start plugins.
-    init = function()
-      -- Load the colorscheme here.
-      -- Like many other themes, this one has different styles, and you could load
-      -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'catppuccin'
+   -- Change the name of the colorscheme plugin below, and then
+   -- change the command in the config to whatever the name of that colorscheme is.
+   --
+   -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
+   --
+   'catppuccin/nvim',
+     priority = 1000, -- Make sure to load this before all the other start plugins.
+     init = function()
+       -- Load the colorscheme here.
+       -- Like many other themes, this one has different styles, and you could load
+       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
+       vim.cmd.colorscheme 'catppuccin'
 
-      vim.cmd.hi 'Comment gui=none'
-    end,
-  },
-  -- Highlight todo, notes, etc in comments
+       vim.cmd.hi 'Comment gui=none'
+     end,
+   },
+   -- Highlight todo, notes, etc in comments
   { 'folke/todo-comments.nvim', event = 'VimEnter', dependencies = { 'nvim-lua/plenary.nvim' }, opts = { signs = false } },
 
-  { -- Collection of various small independent plugins/modules
-    'echasnovski/mini.nvim',
-    config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+  -- { -- Collection of various small independent plugins/modules
+  --   'echasnovski/mini.nvim',
+  --   config = function()
+  --     -- Better Around/Inside textobjects
+  --     --
+  --     -- Examples:
+  --     --  - va)  - [V]isually select [A]round [)]paren
+  --     --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
+  --     --  - ci'  - [C]hange [I]nside [']quote
+  --     require('mini.ai').setup { n_lines = 500 }
 
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+  --     -- Add/delete/replace surroundings (brackets, quotes, etc.)
+  --     --
+  --     -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
+  --     -- - sd'   - [S]urround [D]elete [']quotes
+  --     -- - sr)'  - [S]urround [R]eplace [)] [']
+  --     require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
-      local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
-      statusline.setup { use_icons = vim.g.have_nerd_font }
+  --     -- Simple and easy statusline.
+  --     --  You could remove this setup call if you don't like it,
+  --     --  and try some other statusline plugin
+  --     local statusline = require 'mini.statusline'
+  --     -- set use_icons to true if you have a Nerd Font
+  --     statusline.setup { use_icons = vim.g.have_nerd_font }
 
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
+  --     -- You can configure sections in the statusline by overriding their
+  --     -- default behavior. For example, here we set the section for
+  --     -- cursor location to LINE:COLUMN
+  --     ---@diagnostic disable-next-line: duplicate-set-field
+  --     statusline.section_location = function()
+  --       return '%2l:%-2v'
+  --     end
 
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
-    end,
-  },
+  --     -- ... and there is more!
+  --     --  Check out: https://github.com/echasnovski/mini.nvim
+  --   end,
+  -- },
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
@@ -1178,8 +1178,11 @@ require('lazy').setup({
   --  Uncomment the following line and add your plugins to `lua/custom/plugins/*.lua` to get going.
   --    For additional information, see `:help lazy.nvim-lazy.nvim-structuring-your-plugins`
 
-  { import = 'custom.plugins' },
-
+  {
+    import = 'custom.plugins',
+    -- require("hardtime").setup()
+  },
+  -- NOTE: Probably useful, investigate later.
   {
     'lervag/vimtex',
     lazy = false, -- we don't want to lazy load VimTeX
